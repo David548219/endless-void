@@ -11,27 +11,50 @@
 namespace ui {
 using Callback = std::function<void()>;
 
-class Button : public base::Object {
+class ObjectUI : public base::Object {
  public:
-  Button(Callback onClick, Callback onMouseEnter, Callback onMouseLeave,
-         sf::Vector2f pos, sf::Color bgColor, sf::Color textColor,
-         std::string msg = std::string());
-
   virtual void onUpdate(sf::RenderWindow& window, float deltaTime,
                         const base::UpdateTable& table);
 
- private:
+ protected:
   Callback clickCallback;
   Callback mouseEnterCallback;
   Callback mouseLeaveCallback;
   bool wasClick = false;
   bool wasMouseEnter = false;
   bool wasMouseLeave = true;
+
+  virtual sf::FloatRect getBounds() = 0;
+  virtual void draw(sf::RenderWindow& window) = 0;
+};
+
+class Indicator : public base::Object {};
+
+class Panel : public ObjectUI {
+ public:
+  Panel(Callback onClick, Callback onMouseEnter, Callback onMouseLeave,
+        sf::Vector2f pos, sf::Vector2f size, sf::Color bgColor);
+
+ private:
+  sf::RectangleShape bg;
+
+  virtual sf::FloatRect getBounds() { return bg.getGlobalBounds(); }
+  virtual void draw(sf::RenderWindow& window) { window.draw(bg); }
+};
+
+class Button : public ObjectUI {
+ public:
+  Button(Callback onClick, Callback onMouseEnter, Callback onMouseLeave,
+         sf::Vector2f pos, sf::Color bgColor, sf::Color textColor,
+         std::string msg);
+
+ private:
   sf::Font font;
   sf::Text text;
   sf::RectangleShape bg;
 
-  void draw(sf::RenderWindow& window);
+  virtual sf::FloatRect getBounds() { return bg.getGlobalBounds(); }
+  virtual void draw(sf::RenderWindow& window);
 };
 
 };  // namespace ui

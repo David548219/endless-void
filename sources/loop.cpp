@@ -1,10 +1,15 @@
 // Copyright 2018 David Oganesian david548219@gmail.com
 
 #include <SFML/Graphics.hpp>
+#include <iostream>
 #include <list>
+#include <vector>
 #include "engine/object.hpp"
 #include "engine/scene.hpp"
 #include "engine/ui.hpp"
+
+#include "gameScene.hpp"
+#include "looseScene.hpp"
 
 int main() {
   sf::Clock clock;
@@ -12,11 +17,15 @@ int main() {
                           sf::Style::Titlebar | sf::Style::Close);
   window.setVerticalSyncEnabled(true);
 
-  base::Scene objects;
-  ui::Button b1([]() {}, []() {}, []() {}, sf::Vector2f(32.f, 32.f),
-                sf::Color::Color(0x0A, 0x11, 0x1E),
-                sf::Color::Color(0xAE, 0xB5, 0xC4), "Sample");
-  objects.push_front(&b1);
+  std::vector<base::Scene*> scenes;
+  LooseScene looseScene;
+  scenes.push_back(&looseScene);
+  GameScene gameScene;
+  scenes.push_back(&gameScene);
+
+  for (base::Scene* scene : scenes) {
+    scene->loadScene();
+  }
 
   while (window.isOpen()) {
     clock.restart();
@@ -31,9 +40,8 @@ int main() {
 
     window.clear(sf::Color::Color(0x10, 0x24, 0x4F));
 
-    for (base::Object* object : objects) {
-      object->onUpdateWrapper(window, clock.getElapsedTime().asSeconds(),
-                              table);
+    for (base::Scene* scene : scenes) {
+      scene->renderScene(window, clock.getElapsedTime().asSeconds(), table);
     }
 
     window.display();

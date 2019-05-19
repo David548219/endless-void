@@ -6,39 +6,10 @@
 #include <iostream>
 #include <string>
 
-ui::Button::Button(Callback onClick, ui::Callback onMouseEnter,
-                   Callback onMouseLeave, sf::Vector2f pos, sf::Color bgColor,
-                   sf::Color textColor, std::string msg) {
-  if (!msg.empty()) {
-    if (!font.loadFromFile("Data/arial.ttf")) {
-      std::cerr << "Could not load ~/Data/arial.ttf";
-    }
-
-    text.setFont(font);
-    text.setFillColor(textColor);
-    text.setString(msg);
-    text.setPosition(pos);
-
-    bg.setSize(sf::Vector2f(text.getGlobalBounds().width + 12.f,
-                            text.getGlobalBounds().height + 12.f));
-    bg.setPosition(sf::Vector2f(text.getGlobalBounds().left - 6.f,
-                                text.getGlobalBounds().top - 6.f));
-  } else {
-    bg.setSize(sf::Vector2f(128.f, 64.f));
-    bg.setPosition(pos);
-  }
-
-  bg.setFillColor(bgColor);
-
-  clickCallback = onClick;
-  mouseEnterCallback = onMouseEnter;
-  mouseLeaveCallback = onMouseLeave;
-}
-
-void ui::Button::onUpdate(sf::RenderWindow& window, float deltaTime,
-                          const base::UpdateTable& table) {
+void ui::ObjectUI::onUpdate(sf::RenderWindow& window, float deltaTime,
+                            const base::UpdateTable& table) {
   draw(window);
-  if (bg.getGlobalBounds().contains(table.mousePos)) {
+  if (getBounds().contains(table.mousePos)) {
     wasMouseLeave = false;
 
     if (!wasMouseEnter) {
@@ -62,6 +33,40 @@ void ui::Button::onUpdate(sf::RenderWindow& window, float deltaTime,
       wasMouseLeave = true;
     }
   }
+}
+
+ui::Panel::Panel(Callback onClick, Callback onMouseEnter, Callback onMouseLeave,
+                 sf::Vector2f pos, sf::Vector2f size, sf::Color bgColor) {
+  bg.setSize(size);
+  bg.setPosition(pos);
+  bg.setFillColor(bgColor);
+
+  clickCallback = onClick;
+  mouseEnterCallback = onMouseEnter;
+  mouseLeaveCallback = onMouseLeave;
+}
+
+ui::Button::Button(Callback onClick, ui::Callback onMouseEnter,
+                   Callback onMouseLeave, sf::Vector2f pos, sf::Color bgColor,
+                   sf::Color textColor, std::string msg) {
+  if (!font.loadFromFile("Data/arial.ttf")) {
+    std::cerr << "Could not load ~/Data/arial.ttf";
+  }
+
+  text.setFont(font);
+  text.setFillColor(textColor);
+  text.setString(msg);
+  text.setPosition(pos);
+  bg.setSize(sf::Vector2f(text.getGlobalBounds().width + 12.f,
+                          text.getGlobalBounds().height + 12.f));
+  bg.setPosition(sf::Vector2f(text.getGlobalBounds().left - 6.f,
+                              text.getGlobalBounds().top - 6.f));
+
+  bg.setFillColor(bgColor);
+
+  clickCallback = onClick;
+  mouseEnterCallback = onMouseEnter;
+  mouseLeaveCallback = onMouseLeave;
 }
 
 void ui::Button::draw(sf::RenderWindow& window) {

@@ -4,20 +4,24 @@
 #define INCLUDE_SCENE_HPP_
 
 #include <SFML/Graphics.hpp>
-#include "engine/object.hpp"
 #include <functional>
-#include <list>
+#include <vector>
+#include "engine/object.hpp"
 
 namespace base {
 class Scene {
  public:
-  std::list<Object*>::iterator push_front(Object* object);
-  
-  std::list<Object*>::iterator begin() { return objects.begin(); }
-  std::list<Object*>::iterator end() { return objects.end(); }
+  ~Scene() { unloadScene(); }
 
- private:
-  std::list<Object*> objects;
+  void renderScene(sf::RenderWindow& window, float deltaTime,
+                   const UpdateTable& table);
+  virtual void loadScene() = 0;
+  void unloadScene();
+
+ protected:
+  std::vector<Object*> objects;
+  bool isLoaded = false;
+  bool enabled = false;
 };
 
 }  // namespace base

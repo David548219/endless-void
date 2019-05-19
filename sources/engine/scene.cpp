@@ -3,7 +3,22 @@
 #include "engine/scene.hpp"
 #include "engine/object.hpp"
 
-std::list<base::Object*>::iterator base::Scene::push_front(Object* object) {
-  objects.push_front(object);
-  return objects.begin();
+void base::Scene::renderScene(sf::RenderWindow& window, float deltaTime,
+                              const UpdateTable& table) {
+  if (enabled && isLoaded) {
+    for (base::Object* object : objects) {
+      object->onUpdateWrapper(window, deltaTime, table);
+    }
+  }
+}
+
+void base::Scene::unloadScene() {
+  if (isLoaded) {
+    for (base::Object* object : objects) {
+      delete object;
+    }
+    objects.clear();
+    enabled = false;
+    isLoaded = false;
+  }
 }
