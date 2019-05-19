@@ -4,12 +4,11 @@
 #define INCLUDE_INTERFACES_HPP_
 
 #include "engine/base.hpp"
+#include <functional>
+#include <list>
+
 namespace internal {
-class IUpdate {
- public:
-  ~IUpdate() {}
-  virtual void onUpdate(sf::RenderWindow& window, float deltaTime, const UpdateTable& table) = 0;
-};
+
 
 }  // namespace internal
 #endif  // INCLUDE_INTERFACES_HPP_

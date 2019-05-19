@@ -1,12 +1,21 @@
 // Copyright 2018 David Oganesian david548219@gmail.com
 
 #include <SFML/Graphics.hpp>
+#include <list>
 #include "engine/ui.hpp"
 
 int main() {
   sf::Clock clock;
-  sf::RenderWindow window(sf::VideoMode(1280, 720), "Endless void", sf::Style::Titlebar | sf::Style::Close);
+  sf::RenderWindow window(sf::VideoMode(1280, 720), "Endless void",
+                          sf::Style::Titlebar | sf::Style::Close);
   window.setVerticalSyncEnabled(true);
+
+  std::list<internal::Object*> objects;
+
+  ui::Button b1([]() {}, []() {}, []() {}, sf::Vector2f(32.f, 32.f),
+                sf::Color::Color(0x0A, 0x11, 0x1E),
+                sf::Color::Color(0xAE, 0xB5, 0xC4), "Sample");
+  b1.subscribe(objects);
 
   while (window.isOpen()) {
     clock.restart();
@@ -21,11 +30,11 @@ int main() {
 
     window.clear(sf::Color::Color(0x10, 0x24, 0x4F));
 
-    // Rendering
-    //b.onUpdate(window, clock.getElapsedTime().asSeconds(), table);
+    for (internal::Object* object : objects) {
+      object->onUpdateWrapper(window, clock.getElapsedTime().asSeconds(), table);
+    }
 
     window.display();
   }
-
   return 0;
 }
