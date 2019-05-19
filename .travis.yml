@@ -9,12 +9,17 @@ jobs:
   include:
   - name: "checks"
     script:
+    - chmod +x ./scripts/checks.sh
     - docker run -v `pwd`:`pwd` -w `pwd` --cap-add=SYS_PTRACE -t rusdevops/bootstrap-cpp scripts/checks.sh
   - name: "tests"
     script:
+    - chmod +x ./scripts/tests.sh
     - docker run -v `pwd`:`pwd` -w `pwd` -t rusdevops/bootstrap-cpp scripts/tests.sh
   - name: "quality"
     script:
+    - chmod +x ./scripts/genenv.sh
+    - chmod +x ./scripts/coverage.sh
+    - chmod +x ./scripts/duplication.sh
     - ./scripts/genenv.sh
     - docker run --env-file .env -v `pwd`:`pwd` -w `pwd` -t rusdevops/bootstrap-cpp scripts/coverage.sh
     - docker run --env-file .env -v `pwd`:`pwd` -w `pwd` -t rusdevops/bootstrap-cpp scripts/duplication.sh
