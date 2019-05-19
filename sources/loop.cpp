@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 #include <list>
+#include "engine/object.hpp"
+#include "engine/scene.hpp"
 #include "engine/ui.hpp"
 
 int main() {
@@ -10,12 +12,11 @@ int main() {
                           sf::Style::Titlebar | sf::Style::Close);
   window.setVerticalSyncEnabled(true);
 
-  std::list<internal::Object*> objects;
-
+  base::Scene objects;
   ui::Button b1([]() {}, []() {}, []() {}, sf::Vector2f(32.f, 32.f),
                 sf::Color::Color(0x0A, 0x11, 0x1E),
                 sf::Color::Color(0xAE, 0xB5, 0xC4), "Sample");
-  b1.subscribe(objects);
+  objects.push_front(&b1);
 
   while (window.isOpen()) {
     clock.restart();
@@ -24,14 +25,15 @@ int main() {
       if (event.type == sf::Event::Closed) window.close();
     }
 
-    internal::UpdateTable table{
+    base::UpdateTable table{
         sf::Vector2f(sf::Mouse::getPosition(window)),
         sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)};
 
     window.clear(sf::Color::Color(0x10, 0x24, 0x4F));
 
-    for (internal::Object* object : objects) {
-      object->onUpdateWrapper(window, clock.getElapsedTime().asSeconds(), table);
+    for (base::Object* object : objects) {
+      object->onUpdateWrapper(window, clock.getElapsedTime().asSeconds(),
+                              table);
     }
 
     window.display();
