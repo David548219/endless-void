@@ -30,16 +30,20 @@ class ObjectUI : public base::Object {
 
 class Indicator : public base::Object {};
 
-class Panel : public ObjectUI {
+class Image : public ObjectUI {
  public:
-  Panel(Callback onClick, Callback onMouseEnter, Callback onMouseLeave,
-        sf::Vector2f pos, sf::Vector2f size, sf::Color bgColor);
+  ~Image() { delete texture; }
+  Image(Callback onClick, Callback onMouseEnter, Callback onMouseLeave,
+        sf::Vector2f pos, sf::Texture* texturePtr,
+        sf::Color color = sf::Color::White);
+  void setRectSize(const sf::Vector2i& size);
+  void setColor(const sf::Color& color);
 
  private:
-  sf::RectangleShape bg;
-
-  virtual sf::FloatRect getBounds() { return bg.getGlobalBounds(); }
-  virtual void draw(sf::RenderWindow& window) { window.draw(bg); }
+  sf::Sprite sprite;
+  sf::Texture* texture;
+  virtual sf::FloatRect getBounds() { return sprite.getGlobalBounds(); }
+  virtual void draw(sf::RenderWindow& window) { window.draw(sprite); }
 };
 
 class Button : public ObjectUI {
@@ -51,9 +55,9 @@ class Button : public ObjectUI {
  private:
   sf::Font font;
   sf::Text text;
-  sf::RectangleShape bg;
+  sf::RectangleShape sprite;
 
-  virtual sf::FloatRect getBounds() { return bg.getGlobalBounds(); }
+  virtual sf::FloatRect getBounds() { return sprite.getGlobalBounds(); }
   virtual void draw(sf::RenderWindow& window);
 };
 

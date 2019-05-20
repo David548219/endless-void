@@ -35,16 +35,25 @@ void ui::ObjectUI::onUpdate(sf::RenderWindow& window, float deltaTime,
   }
 }
 
-ui::Panel::Panel(Callback onClick, Callback onMouseEnter, Callback onMouseLeave,
-                 sf::Vector2f pos, sf::Vector2f size, sf::Color bgColor) {
-  bg.setSize(size);
-  bg.setPosition(pos);
-  bg.setFillColor(bgColor);
+ui::Image::Image(Callback onClick, Callback onMouseEnter, Callback onMouseLeave,
+                 sf::Vector2f pos, sf::Texture* texturePtr, sf::Color color) {
+  sprite.setPosition(pos);
+  sprite.setColor(color);
+  texture = texturePtr;
+  sprite.setTexture(*texturePtr);
 
   clickCallback = onClick;
   mouseEnterCallback = onMouseEnter;
   mouseLeaveCallback = onMouseLeave;
 }
+
+void ui::Image::setRectSize(const sf::Vector2i& size) {
+  sprite.setTextureRect(sf::IntRect(sprite.getTextureRect().left,
+                                    sprite.getTextureRect().left, size.x,
+                                    size.y));
+}
+
+void ui::Image::setColor(const sf::Color& color) { sprite.setColor(color); }
 
 ui::Button::Button(Callback onClick, ui::Callback onMouseEnter,
                    Callback onMouseLeave, sf::Vector2f pos, sf::Color bgColor,
@@ -57,12 +66,12 @@ ui::Button::Button(Callback onClick, ui::Callback onMouseEnter,
   text.setFillColor(textColor);
   text.setString(msg);
   text.setPosition(pos);
-  bg.setSize(sf::Vector2f(text.getGlobalBounds().width + 12.f,
-                          text.getGlobalBounds().height + 12.f));
-  bg.setPosition(sf::Vector2f(text.getGlobalBounds().left - 6.f,
-                              text.getGlobalBounds().top - 6.f));
+  sprite.setSize(sf::Vector2f(text.getGlobalBounds().width + 12.f,
+                              text.getGlobalBounds().height + 12.f));
+  sprite.setPosition(sf::Vector2f(text.getGlobalBounds().left - 6.f,
+                                  text.getGlobalBounds().top - 6.f));
 
-  bg.setFillColor(bgColor);
+  sprite.setFillColor(bgColor);
 
   clickCallback = onClick;
   mouseEnterCallback = onMouseEnter;
@@ -70,6 +79,6 @@ ui::Button::Button(Callback onClick, ui::Callback onMouseEnter,
 }
 
 void ui::Button::draw(sf::RenderWindow& window) {
-  window.draw(bg);
+  window.draw(sprite);
   window.draw(text);
 }
