@@ -34,8 +34,6 @@ class ObjectUI : public base::Object {
   virtual void draw(sf::RenderWindow& window) = 0;
 };
 
-class Indicator : public base::Object {};
-
 class Image : public ObjectUI {
  public:
   ~Image() { delete texture; }
@@ -43,6 +41,7 @@ class Image : public ObjectUI {
         sf::Color color = sf::Color::White, Callback onClick = []() {},
         Callback onMouseEnter = []() {}, Callback onMouseLeave = []() {});
   void setRectSize(const sf::Vector2i& size);
+  sf::IntRect getRect() { return sprite.getTextureRect(); }
   void setColor(const sf::Color& color);
 
  private:
@@ -50,6 +49,21 @@ class Image : public ObjectUI {
   sf::Texture* texture;
   virtual sf::FloatRect getBounds() { return sprite.getGlobalBounds(); }
   virtual void draw(sf::RenderWindow& window) { window.draw(sprite); }
+};
+
+class Indicator : Image {
+ public:
+  Indicator(sf::Vector2f pos, sf::Texture* texturePtr, int step, int max, bool isHorizontalOrientation,
+            sf::Color color = sf::Color::White, Callback onClick = []() {},
+            Callback onMouseEnter = []() {}, Callback onMouseLeave = []() {});
+  void setIndicatorPos(int pos);
+  void addToIndicatorPos(int delta) { setIndicatorPos(currentMeasure + delta); }
+
+ private:
+  int stepInPx;
+  int currentMeasure;
+  int maxMeasure;
+  bool isHorizontal;
 };
 
 class Button : public ObjectUI {

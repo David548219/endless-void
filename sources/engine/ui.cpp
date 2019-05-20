@@ -35,9 +35,8 @@ void ui::ObjectUI::onUpdate(sf::RenderWindow& window, float deltaTime,
   }
 }
 
-ui::Image::Image(sf::Vector2f pos, sf::Texture* texturePtr,
-                 sf::Color color , Callback onClick ,
-                 Callback onMouseEnter,
+ui::Image::Image(sf::Vector2f pos, sf::Texture* texturePtr, sf::Color color,
+                 Callback onClick, Callback onMouseEnter,
                  Callback onMouseLeave) {
   sprite.setPosition(pos);
   sprite.setColor(color);
@@ -57,10 +56,38 @@ void ui::Image::setRectSize(const sf::Vector2i& size) {
 
 void ui::Image::setColor(const sf::Color& color) { sprite.setColor(color); }
 
+ui::Indicator::Indicator(sf::Vector2f pos, sf::Texture* texturePtr, int step,
+                         int max, bool isHorizontalOrientation,
+                         sf::Color color = sf::Color::White,
+                         Callback onClick = []() {},
+                         Callback onMouseEnter = []() {},
+                         Callback onMouseLeave = []() {})
+    : ui::Image(pos, texturePtr, color, onClick, onMouseEnter, onMouseLeave) {
+  stepInPx = step;
+  currentMeasure = max;
+  maxMeasure = max;
+  isHorizontal = isHorizontalOrientation;
+}
+
+void ui::Indicator::setIndicatorPos(int pos) {
+  if (pos < 0 || pos > maxMeasure) {
+    std::cerr << "Can not set indicator to negative or too high value"
+              << std::endl;
+    return;
+  }
+  if (isHorizontal) {
+    setRectSize(sf::Vector2i(getRect().width - (currentMeasure - pos),
+                             getRect().height));
+  } else {
+    setRectSize(sf::Vector2i(getRect().width,
+                             getRect().height - (currentMeasure - pos)));
+  }
+  currentMeasure = pos;
+}
+
 ui::Button::Button(sf::Vector2f pos, sf::Color bgColor, sf::Color textColor,
-                   std::string msg, Callback onClick,
-                   Callback onMouseEnter ,
-                   Callback onMouseLeave ) {
+                   std::string msg, Callback onClick, Callback onMouseEnter,
+                   Callback onMouseLeave) {
   if (!font.loadFromFile("Data/arial.ttf")) {
     std::cerr << "Could not load ~/Data/arial.ttf";
   }

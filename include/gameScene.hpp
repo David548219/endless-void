@@ -16,12 +16,19 @@ class GameScene : public base::Scene {
     ui::Image* background = new ui::Image(sf::Vector2f(0, 0), uiBackground);
     objects.push_back(background);
 
+    sf::Texture* uiShip = new sf::Texture;
+    if (!uiShip->loadFromFile("Data/ui_ship.png")) {
+      std::cerr << "Could not load ~/Data/ui_ship.png";
+    }
+    ui::Image* ship_panel = new ui::Image(sf::Vector2f(150, 200), uiShip);
+    objects.push_back(ship_panel);
+
     sf::Texture* uiEnemyPanel = new sf::Texture;
     if (!uiEnemyPanel->loadFromFile("Data/ui_enemyPanel.png")) {
       std::cerr << "Could not load ~/Data/ui_enemyPanel.png";
     }
     ui::Image* enemy_panel = new ui::Image(sf::Vector2f(860, 80), uiEnemyPanel);
-    //objects.push_back(enemy_panel);
+    objects.push_back(enemy_panel);
 
     sf::Texture* uiShieldBubble = new sf::Texture;
     if (!uiShieldBubble->loadFromFile("Data/ui_shieldBubble.png")) {
@@ -54,6 +61,9 @@ class GameScene : public base::Scene {
     isLoaded = true;
     enabled = true;
   }
+
+ private:
+
 };
 
 #endif  // INCLUDE_GAMESCENE_HPP_
