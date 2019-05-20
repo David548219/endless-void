@@ -31,10 +31,20 @@ class PlayerContainer {
   }
   void AddShields(int delta) { SetShields(shields + delta); }
 
+  int GetEnergy() { return energy; }
+  void SetEnergy(int e) {
+    if (e < 0 || e > 1000) {
+      return;
+    }
+    energy = e;
+  }
+  void AddEnergy(int delta) { SetEnergy(energy + delta); }
+
  private:
   ui::Callback deathCallback;
   int health = 30;
   int shields = 5;
+  int energy = 1000;
 };
 
 #endif  // INCLUDE_PLAYER_HPP_

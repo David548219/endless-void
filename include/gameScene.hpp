@@ -69,12 +69,29 @@ class GameScene : public base::Scene {
         });
     objects.push_back(health_points);
 
+    ui::ProgressBar* energy =
+        new ui::ProgressBar(sf::Vector2f(20 + 272, 20 + 64),
+                            sf::Vector2f(248, 28), sf::Color(0x15, 0xA1, 0xBD), true);
+    energy->setLateUpdateCallback([energy](sf::RenderWindow& window,
+                                           float deltaTime,
+                                           const base::UpdateTable& table) {
+      energy->setPercentage(table.playerContainer->GetEnergy() / 1000.f);
+    });
+    objects.push_back(energy);
+
     sf::Texture* uiMainBar = new sf::Texture;
     if (!uiMainBar->loadFromFile("Data/ui_mainBar.png")) {
       std::cerr << "Could not load ~/Data/ui_mainBar.png";
     }
     ui::Image* main_bar = new ui::Image(sf::Vector2f(20, 20), uiMainBar);
     objects.push_back(main_bar);
+
+    sf::Texture* uiGunBar = new sf::Texture;
+    if (!uiGunBar->loadFromFile("Data/ui_gunBar.png")) {
+      std::cerr << "Could not load ~/Data/ui_gunBar.png";
+    }
+    ui::Image* gun_bar = new ui::Image(sf::Vector2f(70, 600), uiGunBar);
+    objects.push_back(gun_bar);
 
     ui::Text* fps_counter =
         new ui::Text(sf::Vector2f(0, 685), sf::Color::Red, "0");

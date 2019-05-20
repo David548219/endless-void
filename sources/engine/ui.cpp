@@ -39,10 +39,12 @@ void ui::ObjectUI::onUpdate(sf::RenderWindow& window, float deltaTime,
 ui::Image::Image(sf::Vector2f pos, sf::Texture* texturePtr, sf::Color color,
                  Callback onClick, Callback onMouseEnter,
                  Callback onMouseLeave) {
+  if (texturePtr != nullptr) {
+    texture = texturePtr;
+    sprite.setTexture(*texturePtr);
+  }
   sprite.setPosition(pos);
   sprite.setColor(color);
-  texture = texturePtr;
-  sprite.setTexture(*texturePtr);
 
   clickCallback = onClick;
   mouseEnterCallback = onMouseEnter;
@@ -58,10 +60,11 @@ void ui::Image::setRectSize(const sf::Vector2i& size) {
 void ui::Image::setColor(const sf::Color& color) { sprite.setColor(color); }
 
 ui::Indicator::Indicator(sf::Vector2f pos, sf::Texture* texturePtr, int step,
-                         int max, bool isHorizontalOrientation, IntCallback onChange,
-                         Callback onClick, Callback onMouseEnter,
-                         Callback onMouseLeave)
-    : ui::Image(pos, texturePtr, sf::Color::White, onClick, onMouseEnter, onMouseLeave) {
+                         int max, bool isHorizontalOrientation,
+                         IntCallback onChange, Callback onClick,
+                         Callback onMouseEnter, Callback onMouseLeave)
+    : ui::Image(pos, texturePtr, sf::Color::White, onClick, onMouseEnter,
+                onMouseLeave) {
   texturePtr->setRepeated(true);
   changeCallback = onChange;
   stepInPx = step;
@@ -118,9 +121,42 @@ void ui::Button::draw(sf::RenderWindow& window) {
   window.draw(text);
 }
 
-ui::Text::Text(sf::Vector2f pos, sf::Color textColor,
-                   std::string msg, Callback onClick, Callback onMouseEnter,
-                   Callback onMouseLeave) {
+ui::Panel::Panel(sf::Vector2f pos, sf::Vector2f size, sf::Color bgColor,
+                 Callback onClick, Callback onMouseEnter,
+                 Callback onMouseLeave) {
+  sprite.setSize(size);
+  sprite.setPosition(pos);
+
+  sprite.setFillColor(bgColor);
+
+  clickCallback = onClick;
+  mouseEnterCallback = onMouseEnter;
+  mouseLeaveCallback = onMouseLeave;
+}
+
+ui::ProgressBar::ProgressBar(sf::Vector2f pos, sf::Vector2f size,
+                             sf::Color bgColor, bool isHorizontalOrientation,
+                             Callback onClick, Callback onMouseEnter,
+                             Callback onMouseLeave)
+    : Panel(pos, size, bgColor, onClick, onMouseEnter, onMouseLeave) {
+  isHorizontal = isHorizontalOrientation;
+  if (isHorizontal) {
+    max = size.x;
+  } else {
+    max = size.y;
+  }
+}
+
+void ui::ProgressBar::setPercentage(float pr) {
+  if (isHorizontal) {
+    setSize(sf::Vector2f(max * pr, getSize().y));
+  } else {
+    setSize(sf::Vector2f(getSize().x, max * pr));
+  }
+}
+
+ui::Text::Text(sf::Vector2f pos, sf::Color textColor, std::string msg,
+               Callback onClick, Callback onMouseEnter, Callback onMouseLeave) {
   if (!font.loadFromFile("Data/arial.ttf")) {
     std::cerr << "Could not load ~/Data/arial.ttf";
   }

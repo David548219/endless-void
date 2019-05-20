@@ -86,6 +86,35 @@ class Button : public ObjectUI {
   virtual void draw(sf::RenderWindow& window);
 };
 
+class Panel : public ObjectUI {
+ public:
+  Panel(sf::Vector2f pos, sf::Vector2f size, sf::Color bgColor,
+        Callback onClick = []() {}, Callback onMouseEnter = []() {},
+        Callback onMouseLeave = []() {});
+
+  void setSize(sf::Vector2f size) { sprite.setSize(size); }
+  sf::Vector2f getSize() { return sprite.getSize(); }
+
+ private:
+  sf::RectangleShape sprite;
+
+  virtual sf::FloatRect getBounds() { return sprite.getGlobalBounds(); }
+  virtual void draw(sf::RenderWindow& window) { window.draw(sprite); }
+};
+
+class ProgressBar : public Panel {
+ public:
+  ProgressBar(sf::Vector2f pos, sf::Vector2f size, sf::Color bgColor,
+              bool isHorizontalOrientation, Callback onClick = []() {},
+              Callback onMouseEnter = []() {}, Callback onMouseLeave = []() {});
+
+  void setPercentage(float pr);
+
+ private:
+  float max;
+  bool isHorizontal;
+};
+
 class Text : public ObjectUI {
  public:
   Text(sf::Vector2f pos, sf::Color textColor, std::string msg,
