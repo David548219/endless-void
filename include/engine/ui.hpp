@@ -11,6 +11,12 @@
 namespace ui {
 using Callback = std::function<void()>;
 
+struct CallbackTable {
+  Callback onClick = []() {};
+  Callback onMouseEnter = []() {};
+  Callback onMouseLeave = []() {};
+};
+
 class ObjectUI : public base::Object {
  public:
   virtual void onUpdate(sf::RenderWindow& window, float deltaTime,
@@ -33,9 +39,9 @@ class Indicator : public base::Object {};
 class Image : public ObjectUI {
  public:
   ~Image() { delete texture; }
-  Image(Callback onClick, Callback onMouseEnter, Callback onMouseLeave,
-        sf::Vector2f pos, sf::Texture* texturePtr,
-        sf::Color color = sf::Color::White);
+  Image(sf::Vector2f pos, sf::Texture* texturePtr,
+        sf::Color color = sf::Color::White, Callback onClick = []() {},
+        Callback onMouseEnter = []() {}, Callback onMouseLeave = []() {});
   void setRectSize(const sf::Vector2i& size);
   void setColor(const sf::Color& color);
 
@@ -48,9 +54,9 @@ class Image : public ObjectUI {
 
 class Button : public ObjectUI {
  public:
-  Button(Callback onClick, Callback onMouseEnter, Callback onMouseLeave,
-         sf::Vector2f pos, sf::Color bgColor, sf::Color textColor,
-         std::string msg);
+  Button(sf::Vector2f pos, sf::Color bgColor, sf::Color textColor,
+         std::string msg, Callback onClick = []() {},
+         Callback onMouseEnter = []() {}, Callback onMouseLeave = []() {});
 
  private:
   sf::Font font;

@@ -9,13 +9,27 @@
 class GameScene : public base::Scene {
  public:
   virtual void loadScene() {
+    sf::Texture* uiBackground = new sf::Texture;
+    if (!uiBackground->loadFromFile("Data/ui_background.png")) {
+      std::cerr << "Could not load ~/Data/ui_background.png";
+    }
+    ui::Image* background = new ui::Image(sf::Vector2f(0, 0), uiBackground);
+    objects.push_back(background);
+
+    sf::Texture* uiEnemyPanel = new sf::Texture;
+    if (!uiEnemyPanel->loadFromFile("Data/ui_enemyPanel.png")) {
+      std::cerr << "Could not load ~/Data/ui_enemyPanel.png";
+    }
+    ui::Image* enemy_panel = new ui::Image(sf::Vector2f(860, 80), uiEnemyPanel);
+    //objects.push_back(enemy_panel);
+
     sf::Texture* uiShieldBubble = new sf::Texture;
     if (!uiShieldBubble->loadFromFile("Data/ui_shieldBubble.png")) {
       std::cerr << "Could not load ~/Data/ui_shieldBubble.png";
     }
     uiShieldBubble->setRepeated(true);
-    ui::Image* shield_bubbles = new ui::Image(
-        []() {}, []() {}, []() {}, sf::Vector2f(20 + 8, 20 + 64), uiShieldBubble);
+    ui::Image* shield_bubbles =
+        new ui::Image(sf::Vector2f(20 + 123, 20 + 64), uiShieldBubble);
     shield_bubbles->setRectSize(sf::Vector2i(140, 28));
     objects.push_back(shield_bubbles);
 
@@ -25,19 +39,17 @@ class GameScene : public base::Scene {
     }
     uiHealthPoint->setRepeated(true);
     ui::Image* health_points =
-        new ui::Image([]() {}, []() {}, []() {}, sf::Vector2f(20 + 8, 20 + 8),
-                      uiHealthPoint);
+        new ui::Image(sf::Vector2f(20 + 9, 20 + 8), uiHealthPoint);
     health_points->setRectSize(sf::Vector2i(510, 48));
     health_points->setColor(sf::Color(0x02, 0x92, 0x00));
     objects.push_back(health_points);
 
-    sf::Texture* uiHull = new sf::Texture;
-    if (!uiHull->loadFromFile("Data/ui_hull.png")) {
-      std::cerr << "Could not load ~/Data/ui_hull.png";
+    sf::Texture* uiMainBar = new sf::Texture;
+    if (!uiMainBar->loadFromFile("Data/ui_mainBar.png")) {
+      std::cerr << "Could not load ~/Data/ui_mainBar.png";
     }
-    ui::Image* hull_panel =
-        new ui::Image([]() {}, []() {}, []() {}, sf::Vector2f(20, 20), uiHull);
-    objects.push_back(hull_panel);
+    ui::Image* main_bar = new ui::Image(sf::Vector2f(20, 20), uiMainBar);
+    objects.push_back(main_bar);
 
     isLoaded = true;
     enabled = true;

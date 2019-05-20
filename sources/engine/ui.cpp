@@ -35,8 +35,10 @@ void ui::ObjectUI::onUpdate(sf::RenderWindow& window, float deltaTime,
   }
 }
 
-ui::Image::Image(Callback onClick, Callback onMouseEnter, Callback onMouseLeave,
-                 sf::Vector2f pos, sf::Texture* texturePtr, sf::Color color) {
+ui::Image::Image(sf::Vector2f pos, sf::Texture* texturePtr,
+                 sf::Color color , Callback onClick ,
+                 Callback onMouseEnter,
+                 Callback onMouseLeave) {
   sprite.setPosition(pos);
   sprite.setColor(color);
   texture = texturePtr;
@@ -55,9 +57,10 @@ void ui::Image::setRectSize(const sf::Vector2i& size) {
 
 void ui::Image::setColor(const sf::Color& color) { sprite.setColor(color); }
 
-ui::Button::Button(Callback onClick, ui::Callback onMouseEnter,
-                   Callback onMouseLeave, sf::Vector2f pos, sf::Color bgColor,
-                   sf::Color textColor, std::string msg) {
+ui::Button::Button(sf::Vector2f pos, sf::Color bgColor, sf::Color textColor,
+                   std::string msg, Callback onClick,
+                   Callback onMouseEnter ,
+                   Callback onMouseLeave ) {
   if (!font.loadFromFile("Data/arial.ttf")) {
     std::cerr << "Could not load ~/Data/arial.ttf";
   }
