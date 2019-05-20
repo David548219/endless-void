@@ -6,6 +6,8 @@
 #include "engine/scene.hpp"
 #include "engine/ui.hpp"
 
+#include "player.hpp"
+
 class GameScene : public base::Scene {
  public:
   virtual void loadScene() {
@@ -34,21 +36,37 @@ class GameScene : public base::Scene {
     if (!uiShieldBubble->loadFromFile("Data/ui_shieldBubble.png")) {
       std::cerr << "Could not load ~/Data/ui_shieldBubble.png";
     }
-    uiShieldBubble->setRepeated(true);
-    ui::Image* shield_bubbles =
-        new ui::Image(sf::Vector2f(20 + 123, 20 + 64), uiShieldBubble);
-    shield_bubbles->setRectSize(sf::Vector2i(140, 28));
+    ui::Indicator* shield_bubbles = new ui::Indicator(
+        sf::Vector2f(20 + 123, 20 + 64), uiShieldBubble, 28, 5, true);
+    shield_bubbles->setLateUpdateCallback(
+        [shield_bubbles](sf::RenderWindow& window, float deltaTime,
+                         const base::UpdateTable& table) {
+          shield_bubbles->setIndicatorPos(table.playerContainer->GetShields());
+        });
     objects.push_back(shield_bubbles);
 
     sf::Texture* uiHealthPoint = new sf::Texture;
     if (!uiHealthPoint->loadFromFile("Data/ui_HealthPoint.png")) {
       std::cerr << "Could not load ~/Data/ui_HealthPoint.png";
     }
-    uiHealthPoint->setRepeated(true);
-    ui::Image* health_points =
-        new ui::Image(sf::Vector2f(20 + 9, 20 + 8), uiHealthPoint);
-    health_points->setRectSize(sf::Vector2i(510, 48));
+    ui::Indicator* health_points = new ui::Indicator(
+        sf::Vector2f(20 + 9, 20 + 8), uiHealthPoint, 17, 30, true,
+        [health_points](int v) {
+          float p = static_cast<float>(v) / health_points->getMax();
+          if (p > 0.6f) {
+            health_points->setColor(sf::Color(0x02, 0x92, 0x00));
+          } else if (p > 0.25) {
+            health_points->setColor(sf::Color(0xEF, 0xCF, 0x06));
+          } else {
+            health_points->setColor(sf::Color(0xDD, 0x17, 0x17));
+          }
+        });
     health_points->setColor(sf::Color(0x02, 0x92, 0x00));
+    health_points->setLateUpdateCallback(
+        [health_points](sf::RenderWindow& window, float deltaTime,
+                        const base::UpdateTable& table) {
+          health_points->setIndicatorPos(table.playerContainer->GetHealth());
+        });
     objects.push_back(health_points);
 
     sf::Texture* uiMainBar = new sf::Texture;
@@ -58,12 +76,33 @@ class GameScene : public base::Scene {
     ui::Image* main_bar = new ui::Image(sf::Vector2f(20, 20), uiMainBar);
     objects.push_back(main_bar);
 
+    ui::Text* fps_counter =
+        new ui::Text(sf::Vector2f(0, 685), sf::Color::Red, "0");
+    fps_counter->setLateUpdateCallback(
+        [fps_counter](sf::RenderWindow& window, float deltaTime,
+                      const base::UpdateTable& table) {
+          static float time;
+          time += deltaTime;
+          if (time > 0.5f) {
+            long fps = std::lround(1.f / deltaTime);
+            if (fps >= 60) {
+              fps_counter->setColor(sf::Color::Green);
+            } else if (fps >= 30) {
+              fps_counter->setColor(sf::Color::Yellow);
+            } else {
+              fps_counter->setColor(sf::Color::Red);
+            }
+            fps_counter->setText(std::to_string(fps));
+            time = 0.f;
+          }
+        });
+    objects.push_back(fps_counter);
+
     isLoaded = true;
     enabled = true;
   }
 
  private:
-
 };
 
 #endif  // INCLUDE_GAMESCENE_HPP_

@@ -10,19 +10,21 @@
 
 namespace ui {
 using Callback = std::function<void()>;
-
-struct CallbackTable {
-  Callback onClick = []() {};
-  Callback onMouseEnter = []() {};
-  Callback onMouseLeave = []() {};
-};
+using IntCallback = std::function<void(int)>;
+using UpdateCallback =
+    std::function<void(sf::RenderWindow&, float, const base::UpdateTable&)>;
 
 class ObjectUI : public base::Object {
  public:
   virtual void onUpdate(sf::RenderWindow& window, float deltaTime,
                         const base::UpdateTable& table);
+  void setLateUpdateCallback(UpdateCallback onLateUpdate) {
+    lateUpdateCallback = onLateUpdate;
+  }
 
  protected:
+  UpdateCallback lateUpdateCallback = [](sf::RenderWindow&, float,
+                                         const base::UpdateTable&) {};
   Callback clickCallback;
   Callback mouseEnterCallback;
   Callback mouseLeaveCallback;
@@ -51,15 +53,18 @@ class Image : public ObjectUI {
   virtual void draw(sf::RenderWindow& window) { window.draw(sprite); }
 };
 
-class Indicator : Image {
+class Indicator : public Image {
  public:
-  Indicator(sf::Vector2f pos, sf::Texture* texturePtr, int step, int max, bool isHorizontalOrientation,
-            sf::Color color = sf::Color::White, Callback onClick = []() {},
-            Callback onMouseEnter = []() {}, Callback onMouseLeave = []() {});
+  Indicator(sf::Vector2f pos, sf::Texture* texturePtr, int step, int max,
+            bool isHorizontalOrientation, IntCallback onChange = [](int a) {},
+            Callback onClick = []() {}, Callback onMouseEnter = []() {},
+            Callback onMouseLeave = []() {});
+  int getMax() { return maxMeasure; }
   void setIndicatorPos(int pos);
   void addToIndicatorPos(int delta) { setIndicatorPos(currentMeasure + delta); }
 
  private:
+  IntCallback changeCallback;
   int stepInPx;
   int currentMeasure;
   int maxMeasure;
@@ -79,6 +84,23 @@ class Button : public ObjectUI {
 
   virtual sf::FloatRect getBounds() { return sprite.getGlobalBounds(); }
   virtual void draw(sf::RenderWindow& window);
+};
+
+class Text : public ObjectUI {
+ public:
+  Text(sf::Vector2f pos, sf::Color textColor, std::string msg,
+       Callback onClick = []() {}, Callback onMouseEnter = []() {},
+       Callback onMouseLeave = []() {});
+
+  void setText(const std::string& txt) { text.setString(txt); }
+  void setColor(const sf::Color& color) { text.setFillColor(color); }
+
+ private:
+  sf::Font font;
+  sf::Text text;
+
+  virtual sf::FloatRect getBounds() { return text.getGlobalBounds(); }
+  virtual void draw(sf::RenderWindow& window) { window.draw(text); }
 };
 
 };  // namespace ui

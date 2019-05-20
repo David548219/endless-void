@@ -33,6 +33,7 @@ void ui::ObjectUI::onUpdate(sf::RenderWindow& window, float deltaTime,
       wasMouseLeave = true;
     }
   }
+  lateUpdateCallback(window, deltaTime, table);
 }
 
 ui::Image::Image(sf::Vector2f pos, sf::Texture* texturePtr, sf::Color color,
@@ -57,16 +58,18 @@ void ui::Image::setRectSize(const sf::Vector2i& size) {
 void ui::Image::setColor(const sf::Color& color) { sprite.setColor(color); }
 
 ui::Indicator::Indicator(sf::Vector2f pos, sf::Texture* texturePtr, int step,
-                         int max, bool isHorizontalOrientation,
-                         sf::Color color = sf::Color::White,
-                         Callback onClick = []() {},
-                         Callback onMouseEnter = []() {},
-                         Callback onMouseLeave = []() {})
-    : ui::Image(pos, texturePtr, color, onClick, onMouseEnter, onMouseLeave) {
+                         int max, bool isHorizontalOrientation, IntCallback onChange,
+                         Callback onClick, Callback onMouseEnter,
+                         Callback onMouseLeave)
+    : ui::Image(pos, texturePtr, sf::Color::White, onClick, onMouseEnter, onMouseLeave) {
+  texturePtr->setRepeated(true);
+  changeCallback = onChange;
   stepInPx = step;
-  currentMeasure = max;
+  currentMeasure = 1;
   maxMeasure = max;
   isHorizontal = isHorizontalOrientation;
+
+  setIndicatorPos(maxMeasure);
 }
 
 void ui::Indicator::setIndicatorPos(int pos) {
@@ -75,14 +78,16 @@ void ui::Indicator::setIndicatorPos(int pos) {
               << std::endl;
     return;
   }
+
   if (isHorizontal) {
-    setRectSize(sf::Vector2i(getRect().width - (currentMeasure - pos),
-                             getRect().height));
+    setRectSize(sf::Vector2i(
+        getRect().width - (currentMeasure - pos) * stepInPx, getRect().height));
   } else {
-    setRectSize(sf::Vector2i(getRect().width,
-                             getRect().height - (currentMeasure - pos)));
+    setRectSize(sf::Vector2i(
+        getRect().width, getRect().height - (currentMeasure - pos) * stepInPx));
   }
   currentMeasure = pos;
+  changeCallback(currentMeasure);
 }
 
 ui::Button::Button(sf::Vector2f pos, sf::Color bgColor, sf::Color textColor,
@@ -111,4 +116,21 @@ ui::Button::Button(sf::Vector2f pos, sf::Color bgColor, sf::Color textColor,
 void ui::Button::draw(sf::RenderWindow& window) {
   window.draw(sprite);
   window.draw(text);
+}
+
+ui::Text::Text(sf::Vector2f pos, sf::Color textColor,
+                   std::string msg, Callback onClick, Callback onMouseEnter,
+                   Callback onMouseLeave) {
+  if (!font.loadFromFile("Data/arial.ttf")) {
+    std::cerr << "Could not load ~/Data/arial.ttf";
+  }
+
+  text.setFont(font);
+  text.setFillColor(textColor);
+  text.setString(msg);
+  text.setPosition(pos);
+
+  clickCallback = onClick;
+  mouseEnterCallback = onMouseEnter;
+  mouseLeaveCallback = onMouseLeave;
 }

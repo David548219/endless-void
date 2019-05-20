@@ -8,6 +8,7 @@
 #include "engine/scene.hpp"
 #include "engine/ui.hpp"
 
+#include "player.hpp"
 #include "gameScene.hpp"
 #include "looseScene.hpp"
 
@@ -27,22 +28,27 @@ int main() {
     scene->loadScene();
   }
 
+  PlayerContainer playerContainer;
+
   while (window.isOpen()) {
-    clock.restart();
+    
     sf::Event event;
     while (window.pollEvent(event)) {
       if (event.type == sf::Event::Closed) window.close();
     }
-
+    
     base::UpdateTable table{
+        &playerContainer,
         sf::Vector2f(sf::Mouse::getPosition(window)),
-        sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)};
+        sf::Mouse::isButtonPressed(sf::Mouse::Button::Left),
+    };
 
     window.clear(sf::Color::Color(0x10, 0x24, 0x4F));
 
     for (base::Scene* scene : scenes) {
       scene->renderScene(window, clock.getElapsedTime().asSeconds(), table);
     }
+    clock.restart();
 
     window.display();
   }

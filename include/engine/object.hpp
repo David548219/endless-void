@@ -6,8 +6,11 @@
 #include <SFML/Graphics.hpp>
 #include <list>
 
+struct PlayerContainer;
+
 namespace base {
 struct UpdateTable {
+  PlayerContainer* playerContainer;
   sf::Vector2f mousePos;
   bool isMouseOneDown;
 };
